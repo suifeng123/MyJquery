@@ -51,12 +51,16 @@
                                 //clone 为src的修正值
                                 clone = src && jQuery.isArray(src)?src:[];
                             }else {
-                                 clone = src && jQuery.isPlainObject
+                                 clone = src && jQuery.isPlainObject(src):{};
                             }
+                            target[name] = jQuery.extend(deep,clone,copy);
+                        }else  if(copy !== undefined){
+                            target[name] = copy;
                         }
                     }
                 }
             }
+            return target;
 
         };
         jQuery.extend({
