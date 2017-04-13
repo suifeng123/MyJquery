@@ -51,7 +51,7 @@
                                 //clone 为src的修正值
                                 clone = src && jQuery.isArray(src)?src:[];
                             }else {
-                                 clone = src && jQuery.isPlainObject(src):{};
+                                 clone = src && jQuery.isPlainObject(src)?src:{};
                             }
                             target[name] = jQuery.extend(deep,clone,copy);
                         }else  if(copy !== undefined){
@@ -64,6 +64,19 @@
 
         };
         jQuery.extend({
+
+            noConflict: function (deep) {
+                //交出$的使用权
+                if(window.$ === jQuery){
+                    window.$ = _$;
+                }
+                if(deep && window.jQuery === jQuery){
+                    window.jQuery = _jQuery;
+                }
+              return jQuery;
+            },
+
+            isReaady: false,
 
         });
         return jQuery;
