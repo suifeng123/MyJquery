@@ -432,6 +432,81 @@
                     return proxy;
             },
 
+            access: function (elems,key,value,exec,fn,pass) {
+                    var length = elems.length;
+
+                    if(typeof key ==="object"){
+                        for(var k in key){
+                            jQuery.access(elems,k,key[k],exec,fn,value);
+                        }
+                        return elems;
+                    }
+
+                    if(value !== undefined ){
+                        exec = !pass && exec && jQuery.isFunction(value);
+                        for(var i=0;i<length;i++){
+                            fn(elems[i],key ,exec ?value.call (elems[i],i,fn(elems[i],key)):value,pass);
+                        }
+                        return elems;
+                    }
+
+                    return length?fn(elems[0],key):undefined;
+
+            },
+            //获取当前时间的函数
+            now: function () {
+                return (new  Date()).getTime();
+            },
+
+            uaMatch: function( ua ) {
+                ua = ua.toLowerCase();
+                // 依次匹配各浏览器
+                var match = rwebkit.exec( ua ) ||
+                    ropera.exec( ua ) ||
+                    rmsie.exec( ua ) ||
+                    ua.indexOf("compatible") < 0 && rmozilla.exec( ua ) ||
+                    [];
+                // match[1] || ""
+                // match[1]为false（空字符串、null、undefined、0等）时，默认为""
+                // match[2] || "0"
+                // match[2]为false（空字符串、null、undefined、0等）时，默认为"0"
+                return { browser: match[1] || "", version: match[2] || "0" };
+            },
+            // 创建一个新的jQuery副本，副本的属性和方法可以被改变，但是不会影响原始的jQuery对象
+            // 有两种用法：
+            // 1. 覆盖jQuery的方法，而不破坏原始的方法
+            // 2.封装，避免命名空间冲突，可以用来开发jQuery插件
+            // 值得注意的是，jQuery.sub()函数并不提供真正的隔离，所有的属性、方法依然指向原始的jQuery
+            // 如果使用这个方法来开发插件，建议优先考虑jQuery UI widget工程
+            sub: function() {
+                function jQuerySub( selector, context ) {
+                    return new jQuerySub.fn.init( selector, context );
+                }
+                jQuery.extend( true, jQuerySub, this ); // 深度拷贝，将jQuery的所有属性和方法拷贝到jQuerySub
+                jQuerySub.superclass = this;
+                jQuerySub.fn = jQuerySub.prototype = this(); //
+                jQuerySub.fn.constructor = jQuerySub;
+                jQuerySub.sub = this.sub;
+                jQuerySub.fn.init = function init( selector, context ) {
+                    if ( context && context instanceof jQuery && !(context instanceof jQuerySub) ) {
+                        context = jQuerySub( context );
+                    }
+
+                    return jQuery.fn.init.call( this, selector, context, rootjQuerySub );
+                };
+                jQuerySub.fn.init.prototype = jQuerySub.fn;
+                var rootjQuerySub = jQuerySub(document);
+                return jQuerySub;
+            },
+            // 浏览器类型和版本：
+            // $.browser.msie/mozilla/webkit/opera
+            // $.browser.version
+            // 不推荐嗅探浏览器类型jQuery.browser，而是检查浏览器的功能特性jQuery.support
+            // 未来jQuery.browser可能会移到一个插件中
+            browser: {}
+
+
+
 
 
 
