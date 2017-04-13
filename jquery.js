@@ -333,9 +333,106 @@
             merge:function (first,second) {
                     var i = first.length;
                     var j=0;
-                    
+                    //如果second的属性是数组，就将其当做数组来处理
+                if(typeof second.length ==="number"){
+                    for(var l = length;j<l;j++){
+                        first[i++] = second[j];
+                    }
+                }else {
+                    //遍历second,将非undefineded的值添加到firtst
+                    while(second[j]!==undefined){
+                        first[i++] = second[j++];
+                    }
+                }
+                 first.length = i;
+                return first;
+            },
 
-            }
+          grep: function (elems,callback,inv) {
+                    var ret = [],reVal;
+                    inv = !!inv;
+
+                    //遍历数组
+              for(var i=0,length = elems.length;i<length;i++){
+                  //这里callback的数组列表为：value,index,与each的习惯一
+                  retVal = !!callback(elems[i],i);
+                  //书否反向选择
+                  if(inv !== reVal){
+                      ret.push(elems[i]);
+                  }
+              }
+               return ret;
+          },
+
+            //将数组或对象
+            map: function (elems,callback,arg) {
+                    var value,key,ret =[],
+                        i = 0,
+                        length = elems.length,
+                        // jquery objects are treated as arrays
+                        // 检测elems是否是（伪）数组
+                        // 1. 将jQuery对象也当成数组处理
+                        // 2. 检测length属性是否存在，length等于0，或第一个和最后一个元素是否存在，或jQuery.isArray返回true
+                        isArray = elems instanceof jQuery
+                            || length !== undefined && typeof length === "number"
+                            && ( ( length > 0 && elems[ 0 ] && elems[ length -1 ] ) || length === 0 || jQuery.isArray( elems ) ) ;
+
+                // 是数组或对象的差别，仅仅是遍历的方式不同，没有其他的区别
+
+                // Go through the array, translating each of the items to their
+                // 遍历数组，对每一个元素调用callback，将返回值不为null的值，存入ret
+                if ( isArray ) {
+                    for ( ; i < length; i++ ) {
+                        // 执行callback，参数依次为value, index, arg
+                        value = callback( elems[ i ], i, arg );
+                        // 如果返回null，则忽略（无返回值的function会返回undefined）
+                        if ( value != null ) {
+                            ret[ ret.length ] = value;
+                        }
+                    }
+
+                    // Go through every key on the object,
+                    // 遍历对象，对每一个属性调用callback，将返回值不为null的值，存入ret
+                } else {
+                    for ( key in elems ) {
+                        // 执行callback，参数依次为value, key, arg
+                        value = callback( elems[ key ], key, arg );
+                        // 同上
+                        if ( value != null ) {
+                            ret[ ret.length ] = value;
+                        }
+                    }
+                }
+
+                // Flatten any nested arrays
+                // 使嵌套数组变平
+                // concat：
+                // 如果某一项为数组，那么添加其内容到末尾。
+                // 如果该项目不是数组，就将其作为单个的数组元素添加到数组的末尾。
+                return ret.concat.apply( [], ret );
+            },
+            guid: 1,
+
+            proxy: function (fn,context) {
+                    if(typeof  context === "string"){
+                        var tmp = fn[context];
+                        context = fn;
+                        fn =tmp;
+                    }
+                    if(!jQuery.isFunction(fn)){
+                        return undefined;
+                    }
+
+                    var args = slice.call(arguments,2),
+                        proxy = function () {
+                            //设置上下文为context和参数
+                            return fn.apply(context,args.concat(slice.call(arguments)));
+                        }
+                   proxy.guid = fn.guid||proxy.guid||jQuery.guid++;
+                    return proxy;
+            },
+
+
 
 
 
