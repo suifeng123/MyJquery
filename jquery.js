@@ -2,6 +2,7 @@
     //mycodes
     var jQuery = (function () {
         //构建jquery对象
+        rootjQuery = window.document;
         var jQuery = function (selector,context) {
             return new jQuery.fn.init(selector,context,rootjQuery);
         }
@@ -13,6 +14,8 @@
             }
         };
         jQuery.fn.init.prototype = jQuery.fn;
+
+        //rootjQuery:window.document;
 
         jQuery.extend = jQuery.fn.extend = function () {
             var options,name,src,copy,copyIsArray,clone,target = arguments[0] || {},
@@ -63,7 +66,16 @@
             return target;
 
         };
+        var promiseMethods = "done fail isResolved isRejected promise then always pipe".split("");
+        var sliceDefered = [].slice;
+
+        var rbrace = /^(?:\{.*\}|\[.*\])$/;
+        var rmultiDash = /([a-z])([A-Z])/g;
         jQuery.extend({
+
+            cache:{},
+            uuid:0,
+
 
             noConflict: function (deep) {
                 //交出$的使用权
@@ -289,14 +301,17 @@
                 return object;
 
             },
-
-            trim:trim?function (text) {
-                return text==null?"":trim.call(text);
-
-                }: function (text) {
-                    return text==null?"":text.toString().replace(trimLeft,"").replace(trimRight,"");
-
-                },
+            //王圣文
+            // trim: function () {
+            //   return;
+            // },
+            // trim: trim?function (text) {
+            //     return text==null?"":trim.call(text);
+            //
+            //     }: function (text) {
+            //         return text==null?"":text.toString().replace(trimLeft,"").replace(trimRight,"");
+            //
+            //     },
 
             //将假的数组妆花为数组
             makeArray: function (array,results) {
@@ -503,7 +518,11 @@
             // $.browser.version
             // 不推荐嗅探浏览器类型jQuery.browser，而是检查浏览器的功能特性jQuery.support
             // 未来jQuery.browser可能会移到一个插件中
-            browser: {}
+            browser: {},
+            
+            _Deferred: function () {
+                callbacks = []
+            }
 
 
 
